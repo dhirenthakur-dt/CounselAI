@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python test_gemini.py)",
+      "Bash(python test_profile_agent.py)",
+      "Bash(python test_server.py)",
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(.\\\\venv\\\\Scripts\\\\activate)",
+      "Bash(source:*)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :8001)",
+      "Bash(tasklist)",
+      "Bash(findstr python:*)",
+      "Bash(findstr :8000)",
+      "Bash(uvicorn:*)"
+    ]
+  }
+}
