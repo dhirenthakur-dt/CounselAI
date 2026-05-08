@@ -1,0 +1,142 @@
+# CounselAI System Audit Report
+## Project Overview
+CounselAI is a multi-agent AI-powered admission counseling system designed specifically for MHT-CET (Maharashtra Common Entrance Test) engineering admissions. The system helps students find eligible colleges, understand admission strategies, and prepare necessary documents based on their exam percentile, category, and preferences.
+
+## Complete Workflow
+
+### 1. User Interaction
+- Student sends a natural language message describing their profile (e.g., "I got 85 percentile in MHT-CET, OBC category, from Mumbai, interested in Computer Science")
+- Message is received by the AI service (FastAPI) at `/extract-profile` endpoint
+
+### 2. Profile Extraction (Profile Agent)
+- Uses Google Gemini AI to parse student message
+- Extracts key information:
+  - Percentile (exam score)
+  - Category (GOPENS, GOBCS, GSCS, GSTS, EWS)
+  - District (Maharashtra districts)
+  - Preferred branches (CS, IT, Mechanical, etc.)
+  - Budget constraints
+  - Hostel requirements
+- Fallback regex parser if AI quota exceeded
+
+### 3. Eligibility Check (Eligibility Agent)
+- Calls Java Spring Boot backend API `/api/ranking/ranked-colleges`
+- Parameters: percentile, category, year (2024), capRound (1), priority (general)
+- Backend queries PostgreSQL database with college cutoff data
+- Returns ranked list of eligible colleges with:
+  - College name, branch, annual fee
+  - Admission chance (HIGH/MEDIUM/LOW)
+  - Total score for ranking
+- Filters results by student's preferred branches if specified
+
+### 4. Strategy Generation (Strategy Agent)
+- Uses Google Gemini AI to analyze eligible colleges
+- Generates CAP (Centralized Admission Process) round strategy
+- Considers admission chances, fees, location preferences
+- Provides round-wise application recommendations
+
+### 5. Document Checklist (Document Agent)
+- Calls backend API `/api/documents/checklist`
+- Fetches required documents based on student category
+- Includes warnings for critical documents
+- Category-specific requirements (caste certificates, income proofs, etc.)
+
+### 6. Final Response Generation (Response Agent)
+- Combines all agent outputs into cohesive response
+- Uses Google Gemini AI to format friendly, helpful response
+- Includes top 5 colleges with chances, fees, scores
+- CAP strategy, document warnings
+- Personalized counseling advice
+
+## Technologies Used
+
+### Backend (Java Spring Boot)
+- **Framework**: Spring Boot 3.5.13
+- **Language**: Java 21
+- **Database**: PostgreSQL
+- **ORM**: Spring Data JPA with Hibernate
+- **Build Tool**: Maven
+- **Dependencies**:
+  - spring-boot-starter-web (REST APIs)
+  - spring-boot-starter-data-jpa (Database access)
+  - postgresql (Database driver)
+  - lombok (Code generation)
+
+### AI Service (Python)
+- **Framework**: FastAPI (REST API)
+- **Language**: Python 3.x
+- **AI**: Google Gemini AI (gemini-2.0-flash-lite, gemini-2.0-flash)
+- **Agent Orchestration**: LangGraph (StateGraph for multi-agent workflow)
+- **Dependencies**:
+  - fastapi (Web framework)
+  - uvicorn (ASGI server)
+  - google-genai (Gemini AI client)
+  - langchain, langchain-google-genai (LLM integration)
+  - langgraph (Agent workflow)
+  - requests (HTTP client)
+  - python-dotenv (Environment variables)
+  - pydantic (Data validation)
+
+### Database Schema
+- **colleges**: College information (name, district, fees, NIRF rank, etc.)
+- **branches**: Engineering branches (CS, IT, Mechanical, etc.)
+- **cutoffs**: Admission cutoffs by college, branch, category, year, round
+- **documents_required**: Document checklists by category
+
+### Infrastructure
+- **Frontend**: Not implemented (empty folder)
+- **Data Processing**: Raw and processed data folders for college/cutoff data
+- **Environment**: Windows development environment
+- **Version Control**: Git (with merge conflicts in README)
+
+## Agent Working System
+
+The system uses a sequential multi-agent architecture orchestrated by LangGraph:
+
+1. **Profile Agent**: Input parsing and profile extraction
+2. **Eligibility Agent**: Database query for eligible colleges
+3. **Strategy Agent**: AI-powered strategy generation
+4. **Document Agent**: Document requirement fetching
+5. **Response Agent**: Final response synthesis
+
+Each agent maintains state in a shared TypedDict with fields for user_message, percentile, category, district, branches, budget, hostel_needed, eligible_colleges, ranked_colleges, strategy, documents, final_response, messages, error.
+
+## API Endpoints
+
+### AI Service (Port 8001)
+- `GET /` - Service status
+- `GET /health` - Health check
+- `POST /extract-profile` - Main counseling endpoint
+
+### Backend (Port 8080)
+- `GET /api/colleges` - List all colleges
+- `GET /api/colleges/{id}` - Get college by ID
+- `POST /api/colleges` - Add new college
+- `GET /api/eligibility/check` - Check eligibility
+- `GET /api/ranking/ranked-colleges` - Get ranked colleges
+- `GET /api/documents/checklist` - Get document checklist
+
+## Configuration
+- Backend: application.properties with PostgreSQL connection
+- AI Service: .env file with GEMINI_API_KEY and BACKEND_URL
+- CORS enabled for cross-origin requests
+- Database: Auto-update schema with Hibernate
+
+## Current Status
+- Backend: Fully implemented with CRUD operations and eligibility logic
+- AI Service: Complete multi-agent pipeline with Gemini integration
+- Frontend: Not implemented
+- Data: Raw and processed folders exist but content not visible
+- README: Has git merge conflicts
+
+## Recommendations
+1. Resolve README merge conflicts
+2. Implement frontend (React/Angular/Vue)
+3. Add comprehensive error handling and logging
+4. Implement authentication and user sessions
+5. Add data validation and sanitization
+6. Set up proper CI/CD pipeline
+7. Add unit and integration tests
+8. Implement caching for API responses
+9. Add monitoring and metrics
+10. Secure API keys and sensitive configuration
