@@ -25,12 +25,13 @@ public class RankingService {
             // --- FACTOR 2: NAAC Grade Score (20%) ---
             String naacGrade = (String) college.get("naacGrade");
             double naacScore = switch (naacGrade != null ? naacGrade : "") {
-                case "A++" -> 20;
-                case "A+"  -> 17;
-                case "A"   -> 14;
-                case "B++" -> 11;
-                case "B+"  -> 8;
-                default    -> 5;
+                case "A++" -> 35;
+                case "A+"  -> 28;
+                case "A"   -> 22;
+                case "B++" -> 16;
+                case "B+"  -> 10;
+                case "C"   -> 5;
+                default    -> 0;
             };
 
             // --- FACTOR 3: Fee Score (20%) ---

@@ -1,0 +1,13 @@
+@echo off
+echo Starting CounselAI Services...
+
+echo Starting Java Backend (Port 8080)...
+start "CounselAI Backend" cmd /k "cd backend && mvnw.cmd spring-boot:run"
+
+echo Starting AI Service (Port 8001)...
+start "CounselAI AI Service" cmd /k "cd ai-service && .\venv\Scripts\python.exe -m uvicorn main:app --port 8001 --host 0.0.0.0"
+
+echo Starting React Frontend (Port 5173)...
+start "CounselAI Frontend" cmd /k "cd frontend && npm run dev"
+
+echo All services started in separate windows!

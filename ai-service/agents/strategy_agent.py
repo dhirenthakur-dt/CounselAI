@@ -12,13 +12,6 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-MODELS_TO_TRY = [
-    "gemini-2.0-flash-lite",
-    "gemini-2.0-flash",
-]
-
-MAX_RETRIES = 3
-
 
 def generate_with_groq(prompt):
     from groq import Groq
@@ -89,7 +82,7 @@ Maximum 200 words total.
     try:
         strategy_text = generate_with_groq(prompt)
         state["strategy"] = strategy_text
-        print(f"✅ Strategy Agent generated advice")
+        print(f"[OK] Strategy Agent generated advice")
 
     except Exception as e:
         logger.error(f"Strategy Agent failed: {e}")

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from agents.pipeline import pipeline
 from agents.profile_agent import profile_agent
+from agents.live_search_agent import search_college_live
 
 app = FastAPI(title="CounselAI - AI Service")
 
@@ -16,6 +17,11 @@ app.add_middleware(
 
 class StudentMessage(BaseModel):
     message: str
+
+
+class CollegeSearchRequest(BaseModel):
+    college_name: str
+    college_id: int
 
 
 @app.get("/")
@@ -102,3 +108,8 @@ def counsel_student(body: StudentMessage):
         "documents": result.get("documents"),
         "error":     result.get("error")
     }
+
+
+@app.post("/college/live-details")
+def get_live_college_details(body: CollegeSearchRequest):
+    return search_college_live(body.college_name)

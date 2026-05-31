@@ -66,10 +66,10 @@ Use simple English. Be friendly. Maximum 300 words.
             max_tokens=600
         )
         state["final_response"] = response.choices[0].message.content.strip()
-        print("✅ Response Agent generated final response")
+        print("[OK] Response Agent generated final response")
 
     except Exception as e:
-        print(f"❌ Response Agent error: {e}")
+        print(f"[ERROR] Response Agent error: {e}")
         state["final_response"] = (
             f"Here are your top colleges for "
             f"{percentile} percentile ({category}):\n\n"

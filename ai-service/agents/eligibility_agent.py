@@ -6,6 +6,9 @@ load_dotenv()
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080")
 
+# ─────────────────────────────────────────────
+# Branch keyword mapping
+# ─────────────────────────────────────────────
 BRANCH_KEYWORDS = {
     "cs":    ["computer science", "computer engineering", "cse"],
     "it":    ["information technology"],
@@ -17,6 +20,9 @@ BRANCH_KEYWORDS = {
     "ds":    ["data science"],
 }
 
+# ─────────────────────────────────────────────
+# Category seat type mapping
+# ─────────────────────────────────────────────
 CATEGORY_MAP = {
     "GOPENS": ["GOPENS", "GOPENH", "GOPENO"],
     "GOBCS":  ["GOBCS",  "GOBCH",  "GOBCO"],
@@ -26,8 +32,158 @@ CATEGORY_MAP = {
     "TFWS":   ["TFWS"],
 }
 
+# ─────────────────────────────────────────────
+# City / Taluka → District mapping
+# Students often type city names not district
+# ─────────────────────────────────────────────
+CITY_TO_DISTRICT = {
+    # Dhule district
+    "shirpur":      "dhule",
+    "dhule":        "dhule",
+    "sakri":        "dhule",
+    "sindkheda":    "dhule",
+    # Nashik district
+    "nashik":       "nashik",
+    "malegaon":     "nashik",
+    "igatpuri":     "nashik",
+    "trimbakeshwar":"nashik",
+    "sinnar":       "nashik",
+    "chandwad":     "nashik",
+    "niphad":       "nashik",
+    "deola":        "nashik",
+    # Pune district
+    "pune":         "pune",
+    "pimpri":       "pune",
+    "chinchwad":    "pune",
+    "baramati":     "pune",
+    "junnar":       "pune",
+    "indapur":      "pune",
+    "bhor":         "pune",
+    "haveli":       "pune",
+    "narhe":        "pune",
+    "hadapsar":     "pune",
+    "ambegaon":     "pune",
+    "khed":         "pune",
+    # Mumbai
+    "mumbai":       "mumbai",
+    "andheri":      "mumbai",
+    "borivali":     "mumbai",
+    "chembur":      "mumbai",
+    "dadar":        "mumbai",
+    "bandra":       "mumbai",
+    # Thane
+    "thane":        "thane",
+    "kalyan":       "thane",
+    "dombivli":     "thane",
+    "ulhasnagar":   "thane",
+    "ambernath":    "thane",
+    "badlapur":     "thane",
+    "bhiwandi":     "thane",
+    "shahapur":     "thane",
+    # Nagpur
+    "nagpur":       "nagpur",
+    "wardha":       "wardha",
+    "yavatmal":     "yavatmal",
+    "wani":         "yavatmal",
+    "pusad":        "yavatmal",
+    # Aurangabad (Sambhajinagar)
+    "aurangabad":   "aurangabad",
+    "sambhajinagar":"aurangabad",
+    "jalna":        "jalna",
+    "paithan":      "aurangabad",
+    # Amravati
+    "amravati":     "amravati",
+    "achalpur":     "amravati",
+    "badnera":      "amravati",
+    # Kolhapur
+    "kolhapur":     "kolhapur",
+    "ichalkaranji": "kolhapur",
+    "hatkanangale": "kolhapur",
+    "kagal":        "kolhapur",
+    # Sangli
+    "sangli":       "sangli",
+    "miraj":        "sangli",
+    "ashta":        "sangli",
+    # Solapur
+    "solapur":      "solapur",
+    "barshi":       "solapur",
+    "akkalkot":     "solapur",
+    # Nandurbar
+    "nandurbar":    "nandurbar",
+    "shahada":      "nandurbar",
+    "taloda":       "nandurbar",
+    # Jalgaon
+    "jalgaon":      "jalgaon",
+    "bhusawal":     "jalgaon",
+    "pachora":      "jalgaon",
+    "amalner":      "jalgaon",
+    "chalisgaon":   "jalgaon",
+    "chopda":       "jalgaon",
+    # Akola
+    "akola":        "akola",
+    "washim":       "washim",
+    "buldhana":     "buldhana",
+    "shegaon":      "buldhana",
+    "mehkar":       "buldhana",
+    # Latur
+    "latur":        "latur",
+    "osmanabad":    "osmanabad",
+    "nanded":       "nanded",
+    "hingoli":      "hingoli",
+    "parbhani":     "parbhani",
+    "selu":         "parbhani",
+    # Ahmednagar
+    "ahmednagar":   "ahmednagar",
+    "rahuri":       "ahmednagar",
+    "kopargaon":    "ahmednagar",
+    "shrirampur":   "ahmednagar",
+    "sangamner":    "ahmednagar",
+    # Satara
+    "satara":       "satara",
+    "karad":        "satara",
+    "phaltan":      "satara",
+    # Ratnagiri
+    "ratnagiri":    "ratnagiri",
+    "chiplun":      "ratnagiri",
+    "khed":         "ratnagiri",
+    # Palghar
+    "palghar":      "palghar",
+    "vasai":        "palghar",
+    "virar":        "palghar",
+    "boisar":       "palghar",
+    "dahanu":       "palghar",
+    # Raigad
+    "raigad":       "raigad",
+    "panvel":       "raigad",
+    "alibag":       "raigad",
+    "pen":          "raigad",
+    "karjat":       "raigad",
+    # Navi Mumbai
+    "navi mumbai":  "thane",
+    "vashi":        "thane",
+    "nerul":        "thane",
+    "belapur":      "thane",
+    "kharghar":     "thane",
+    # Chandrapur
+    "chandrapur":   "chandrapur",
+    "gadchiroli":   "gadchiroli",
+    "gondia":       "gondia",
+    "bhandara":     "bhandara",
+    # Beed
+    "beed":         "beed",
+    "ambajogai":    "beed",
+    # Sindhudurg
+    "sindhudurg":   "sindhudurg",
+    "kudal":        "sindhudurg",
+    "sawantwadi":   "sindhudurg",
+}
+
+# ─────────────────────────────────────────────
+# District → nearby districts (priority order)
+# ─────────────────────────────────────────────
 NEARBY_DISTRICTS = {
-    "nashik":       ["nashik", "pune", "ahmednagar", "aurangabad", "jalgaon", "dhule"],
+    "nashik":       ["nashik", "dhule", "pune", "ahmednagar", "aurangabad", "jalgaon", "nandurbar"],
+    "dhule":        ["dhule", "nashik", "nandurbar", "jalgaon", "ahmednagar"],
     "pune":         ["pune", "mumbai", "satara", "ahmednagar", "solapur", "kolhapur", "nashik"],
     "mumbai":       ["mumbai", "thane", "palghar", "raigad", "pune"],
     "thane":        ["thane", "mumbai", "palghar", "raigad", "nashik"],
@@ -51,7 +207,6 @@ NEARBY_DISTRICTS = {
     "sindhudurg":   ["sindhudurg", "ratnagiri", "kolhapur"],
     "raigad":       ["raigad", "mumbai", "pune", "thane", "ratnagiri"],
     "palghar":      ["palghar", "thane", "mumbai", "nashik"],
-    "dhule":        ["dhule", "nashik", "jalgaon", "nandurbar"],
     "nandurbar":    ["nandurbar", "dhule", "jalgaon", "nashik"],
     "beed":         ["beed", "aurangabad", "ahmednagar", "osmanabad", "latur"],
     "osmanabad":    ["osmanabad", "latur", "solapur", "beed", "nanded"],
@@ -67,7 +222,47 @@ NEARBY_DISTRICTS = {
 MIN_RESULTS = 10
 
 
+def resolve_district(user_input):
+    """
+    Convert city/taluka name to district name.
+    Also handles misspellings with partial match.
+    Returns (district_name, search_terms)
+    """
+    inp = user_input.lower().strip()
+
+    # Direct city match
+    if inp in CITY_TO_DISTRICT:
+        district = CITY_TO_DISTRICT[inp]
+        # Return both city name and district name as search terms
+        return district, [inp, district]
+
+    # Direct district match
+    if inp in NEARBY_DISTRICTS:
+        return inp, [inp]
+
+    # Partial match in city map
+    for city, district in CITY_TO_DISTRICT.items():
+        if city in inp or inp in city:
+            return district, [city, district, inp]
+
+    # Partial match in district map
+    for dist in NEARBY_DISTRICTS:
+        if dist in inp or inp in dist:
+            return dist, [dist, inp]
+
+    # No match — use as-is
+    return inp, [inp]
+
+
 def eligibility_agent(state: dict) -> dict:
+    """
+    Agent 2: Finds eligible colleges based on student profile.
+    - Checks all seat types (State + Home + Other University)
+    - Filters by branch, budget, hostel
+    - Prioritizes colleges by city/district proximity
+    - Handles city names like Shirpur, Ichalkaranji etc.
+    """
+
     percentile = state.get("percentile")
     category   = state.get("category")
 
@@ -81,6 +276,7 @@ def eligibility_agent(state: dict) -> dict:
         all_colleges = []
         seen_keys    = set()
 
+        # ── Fetch from all seat type categories ──────────────────
         for cat in categories_to_check:
             try:
                 resp = requests.get(
@@ -106,7 +302,7 @@ def eligibility_agent(state: dict) -> dict:
         colleges = all_colleges
         print(f"Total before filters: {len(colleges)}")
 
-        # Branch filter
+        # ── Branch filter ─────────────────────────────────────────
         branches = state.get("branches")
         if branches:
             keywords = []
@@ -124,7 +320,7 @@ def eligibility_agent(state: dict) -> dict:
                 colleges = filtered
             print(f"After branch filter: {len(colleges)}")
 
-        # Budget filter
+        # ── Budget filter ─────────────────────────────────────────
         budget = state.get("budget")
         if budget:
             flexible_budget = budget * 1.2
@@ -134,7 +330,7 @@ def eligibility_agent(state: dict) -> dict:
             ]
             print(f"After budget filter: {len(colleges)}")
 
-        # Hostel filter
+        # ── Hostel filter ─────────────────────────────────────────
         hostel_needed = state.get("hostel_needed")
         if hostel_needed:
             hostel_colleges = [c for c in colleges if c.get("hostelAvailable") is True]
@@ -142,23 +338,26 @@ def eligibility_agent(state: dict) -> dict:
                 colleges = hostel_colleges
             print(f"After hostel filter: {len(colleges)}")
 
-        # District priority filter
-        preferred_district = state.get("district")
-        if preferred_district and colleges:
-            district_lower = preferred_district.lower().strip()
+        # ── District/City priority filter ─────────────────────────
+        preferred_location = state.get("district")
 
-            nearby_list = NEARBY_DISTRICTS.get(district_lower)
+        if preferred_location and colleges:
 
-            if not nearby_list:
-                for key in NEARBY_DISTRICTS:
-                    if key in district_lower or district_lower in key:
-                        nearby_list = NEARBY_DISTRICTS[key]
-                        break
+            # Resolve city → district + get all search terms
+            district, search_terms = resolve_district(preferred_location)
 
-            if not nearby_list:
-                nearby_list = [district_lower]
+            # Get nearby districts
+            nearby_list = NEARBY_DISTRICTS.get(district, [district])
 
-            same_district   = []
+            # All terms to check for "same location"
+            # Includes city name + district name
+            same_terms = search_terms + [district]
+
+            print(f"Location: '{preferred_location}' -> district: '{district}'")
+            print(f"Search terms: {same_terms}")
+            print(f"Nearby: {nearby_list[:4]}")
+
+            same_location   = []
             nearby_colleges = []
             other_colleges  = []
 
@@ -167,19 +366,24 @@ def eligibility_agent(state: dict) -> dict:
                 college_district = (c.get("district") or "").lower()
                 location_text    = college_name + " " + college_district
 
-                if nearby_list[0] in location_text:
-                    same_district.append(c)
+                # Priority 1 — Same city OR same district
+                if any(term in location_text for term in same_terms):
+                    same_location.append(c)
+
+                # Priority 2 — Nearby districts
                 elif any(d in location_text for d in nearby_list[1:]):
                     nearby_colleges.append(c)
+
+                # Priority 3 — Rest of Maharashtra
                 else:
                     other_colleges.append(c)
 
-            print(f"Same district ({nearby_list[0]}): {len(same_district)}")
+            print(f"Same location ({preferred_location}): {len(same_location)}")
             print(f"Nearby districts: {len(nearby_colleges)}")
             print(f"Rest Maharashtra: {len(other_colleges)}")
 
             final = []
-            final.extend(same_district)
+            final.extend(same_location)
             if len(final) < MIN_RESULTS:
                 final.extend(nearby_colleges)
             if len(final) < MIN_RESULTS:
@@ -187,6 +391,7 @@ def eligibility_agent(state: dict) -> dict:
 
             colleges = final
 
+        # ── Final result ──────────────────────────────────────────
         state["ranked_colleges"] = colleges
         print(f"Final colleges: {len(colleges)}")
 

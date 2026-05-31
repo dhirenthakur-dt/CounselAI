@@ -139,14 +139,14 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
         state["budget"]        = profile.get("budget")
         state["hostel_needed"] = profile.get("hostel_needed")
 
-        print(f"✅ Profile Agent extracted: {profile}")
+        print(f"[OK] Profile Agent extracted: {profile}")
 
     except Exception as e:
-        print(f"❌ Profile Agent error: {e}")
+        print(f"[ERROR] Profile Agent error: {e}")
         # Check if it's a quota exceeded error
         if "RESOURCE_EXHAUSTED" in str(e) or "quota" in str(e).lower():
             # Fallback to parsing the message manually
-            print("⚠️ Quota exceeded, parsing profile manually")
+            print("[WARN] Quota exceeded, parsing profile manually")
             profile = parse_profile_from_message(user_message)
             state["percentile"]    = profile.get("percentile")
             state["category"]      = profile.get("category")
@@ -154,7 +154,7 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
             state["branches"]      = profile.get("branches")
             state["budget"]        = profile.get("budget")
             state["hostel_needed"] = profile.get("hostel_needed")
-            print(f"✅ Profile Agent parsed manually: {profile}")
+            print(f"[OK] Profile Agent parsed manually: {profile}")
         else:
             state["error"] = "Could not understand your message. Please try again."
 

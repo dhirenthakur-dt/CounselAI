@@ -24,12 +24,12 @@ def document_agent(state: dict) -> dict:
 
         if response.status_code == 200:
             state["documents"] = response.json()
-            print(f"✅ Document Agent fetched checklist for {category}")
+            print(f"[OK] Document Agent fetched checklist for {category}")
         else:
             state["documents"] = {"error": "Could not fetch documents"}
 
     except Exception as e:
-        print(f"❌ Document Agent error: {e}")
+        print(f"[ERROR] Document Agent error: {e}")
         state["documents"] = {"error": "Document service unavailable"}
 
     return state
