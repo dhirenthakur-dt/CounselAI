@@ -16,6 +16,9 @@ public interface CutoffRepository extends JpaRepository<Cutoff, Long> {
     // Get cutoffs by category and year
     List<Cutoff> findByCategoryAndYear(String category, Integer year);
 
+    // Get all cutoffs for a specific college
+    List<Cutoff> findByCollegeIdOrderByYearDesc(Long collegeId);
+
     // THE MOST IMPORTANT QUERY
     // Find all colleges where student percentile >= closing percentile
     @Query("""
