@@ -33,10 +33,12 @@ public class EligibilityService {
             String chance;
             if (safetyMargin >= 3.0) {
                 chance = "HIGH";
-            } else if (safetyMargin >= 1.0) {
+            } else if (safetyMargin >= 0.0) {
                 chance = "MEDIUM";
-            } else {
+            } else if (safetyMargin >= -2.0) {
                 chance = "LOW";
+            } else {
+                chance = "VERY_LOW";
             }
 
             Map<String, Object> entry = new LinkedHashMap<>();

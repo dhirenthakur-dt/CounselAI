@@ -13,11 +13,12 @@ BRANCH_KEYWORDS = {
     "cs":    ["computer science", "computer engineering", "cse"],
     "it":    ["information technology"],
     "aiml":  ["artificial intelligence", "machine learning"],
-    "extc":  ["electronics", "telecommunication"],
+    "extc":  ["electronics", "telecommunication", "entc", "e&tc", "electronics and computer"],
     "mech":  ["mechanical"],
     "civil": ["civil"],
     "elec":  ["electrical"],
     "ds":    ["data science"],
+    "entc":  ["electronics", "telecommunication", "entc", "e&tc"],
 }
 
 # ─────────────────────────────────────────────
@@ -219,7 +220,7 @@ NEARBY_DISTRICTS = {
     "gadchiroli":   ["gadchiroli", "chandrapur", "nagpur", "yavatmal"],
 }
 
-MIN_RESULTS = 10
+MIN_RESULTS = 15
 
 
 def resolve_district(user_input):
@@ -342,6 +343,7 @@ def eligibility_agent(state: dict) -> dict:
         preferred_location = state.get("district")
 
         if preferred_location and colleges:
+            preferred_location = preferred_location.strip().lower()
 
             # Resolve city → district + get all search terms
             district, search_terms = resolve_district(preferred_location)

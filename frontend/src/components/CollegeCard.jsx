@@ -1,16 +1,21 @@
 import { useState } from 'react';
-import { getLiveCollegeDetails } from '../api';
+import { getLiveCollegeDetails, getCollegeCutoffs } from '../api';
 
 const CHANCE = {
-  HIGH:   { color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', label: 'High Chance' },
-  MEDIUM: { color: 'text-amber-400',   bg: 'bg-amber-400/10',   border: 'border-amber-400/20',   label: 'Medium Chance' },
-  LOW:    { color: 'text-red-400',     bg: 'bg-red-400/10',     border: 'border-red-400/20',     label: 'Low Chance' },
+  HIGH:     { color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', label: 'High Chance' },
+  MEDIUM:   { color: 'text-amber-400',   bg: 'bg-amber-400/10',   border: 'border-amber-400/20',   label: 'Medium Chance' },
+  LOW:      { color: 'text-red-400',     bg: 'bg-red-400/10',     border: 'border-red-400/20',     label: 'Low Chance' },
+  VERY_LOW: { color: 'text-red-400',     bg: 'bg-red-400/10',     border: 'border-red-400/20',     label: 'Stretch' },
 };
 
 export default function CollegeCard({ college, rank }) {
   const [live, setLive]         = useState(null);
   const [loading, setLoading]   = useState(false);
   const [open, setOpen]         = useState(false);
+  const [cutoffs, setCutoffs]   = useState(null);
+  const [cutoffsLoading, setCutoffsLoading] = useState(false);
+  const [cutoffsOpen, setCutoffsOpen] = useState(false);
+  const [showAllBranches, setShowAllBranches] = useState(false);
   const c = CHANCE[college.chance] || CHANCE.LOW;
 
   const fetchLive = async () => {
@@ -21,6 +26,16 @@ export default function CollegeCard({ college, rank }) {
       setLive(data);
     } catch { setLive({ error: 'Search failed. Try again.' }); }
     finally { setLoading(false); }
+  };
+
+  const fetchCutoffs = async () => {
+    if (cutoffs) { setCutoffsOpen(o => !o); return; }
+    setCutoffsLoading(true); setCutoffsOpen(true);
+    try {
+      const data = await getCollegeCutoffs(college.collegeId || college.id);
+      setCutoffs(data);
+    } catch { setCutoffs({ error: 'Failed to load cutoffs.' }); }
+    finally { setCutoffsLoading(false); }
   };
 
   return (
@@ -38,11 +53,13 @@ export default function CollegeCard({ college, rank }) {
 
         {/* College name */}
         <h3 className="text-[15px] font-semibold text-white leading-snug mb-1.5 line-clamp-2 group-hover:text-blue-300 transition-colors">
-          {college.collegeName}
+          {college.collegeName || college.name}
         </h3>
 
         {/* Branch */}
-        <p className="text-[13px] text-blue-400 font-medium mb-4">{college.branchName}</p>
+        {college.branchName && (
+          <p className="text-[13px] text-blue-400 font-medium mb-4">{college.branchName}</p>
+        )}
 
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2 mb-4">
@@ -82,24 +99,126 @@ export default function CollegeCard({ college, rank }) {
           )}
         </div>
 
-        {/* Live search button */}
-        <button
-          onClick={fetchLive}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white text-[12px] font-semibold transition-all duration-300 disabled:opacity-50 cursor-pointer shadow-lg shadow-blue-500/5 hover:shadow-blue-500/25"
-        >
-          {loading ? (
-            <>
-              <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              Searching web...
-            </>
-          ) : live ? (
-            open ? '▲ Hide live details' : '▼ Show live details'
-          ) : (
-            '🔍 Get live fee & hostel'
-          )}
-        </button>
+        {/* Action buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Live search button */}
+          <button
+            onClick={fetchLive}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white text-[12px] font-semibold transition-all duration-300 disabled:opacity-50 cursor-pointer shadow-lg shadow-blue-500/5 hover:shadow-blue-500/25"
+          >
+            {loading ? (
+              <>
+                <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Searching...
+              </>
+            ) : live ? (
+              open ? '▲ Hide live info' : '▼ Live fee & info'
+            ) : (
+              '🔍 Live fee & info'
+            )}
+          </button>
+
+          {/* Cutoffs button */}
+          <button
+            onClick={fetchCutoffs}
+            disabled={cutoffsLoading}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-purple-500/30 text-purple-400 hover:bg-purple-500 hover:text-white text-[12px] font-semibold transition-all duration-300 disabled:opacity-50 cursor-pointer shadow-lg shadow-purple-500/5 hover:shadow-purple-500/25"
+          >
+            {cutoffsLoading ? (
+              <>
+                <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Loading...
+              </>
+            ) : cutoffs ? (
+              cutoffsOpen ? '▲ Hide cutoffs' : '▼ Year Cutoffs'
+            ) : (
+              '📈 Year Cutoffs'
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Cutoffs panel */}
+      {cutoffsOpen && (
+        <div className="border-t border-[#1e293b] bg-[#030712]/50 p-5 slide-down">
+          {cutoffsLoading && (
+            <div className="flex items-center justify-center gap-2 text-[12px] text-purple-400">
+              <span className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+              Loading historical cutoffs...
+            </div>
+          )}
+          {cutoffs?.error && <p className="text-[12px] text-red-400 font-medium text-center">{cutoffs.error}</p>}
+          {cutoffs && !cutoffs.error && !cutoffsLoading && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] text-[#64748b] font-bold uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  {showAllBranches ? 'All Branch Cutoffs' : `${college.branchName || 'Branch'} Cutoffs`}
+                </p>
+                <button
+                  onClick={() => setShowAllBranches(p => !p)}
+                  className="text-[10px] font-medium text-purple-400 hover:text-purple-300 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-full transition-colors cursor-pointer"
+                >
+                  {showAllBranches ? `Show Only ${(college.branchName || 'Branch').slice(0, 25)}` : 'Show All Branches'}
+                </button>
+              </div>
+              
+              <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                {(() => {
+                  // Filter cutoffs to only the recommended branch unless showAllBranches is true
+                  const filteredCutoffs = showAllBranches
+                    ? cutoffs
+                    : cutoffs.filter(c => {
+                        const cutoffBranch = (c.branch?.branchName || '').toLowerCase();
+                        const cardBranch = (college.branchName || '').toLowerCase();
+                        return cutoffBranch === cardBranch;
+                      });
+
+                  if (filteredCutoffs.length === 0) {
+                    return (
+                      <div className="text-center py-3">
+                        <p className="text-[12px] text-[#94a3b8] italic mb-2">No cutoff data for this specific branch.</p>
+                        <button
+                          onClick={() => setShowAllBranches(true)}
+                          className="text-[11px] text-purple-400 hover:text-purple-300 underline cursor-pointer"
+                        >
+                          View all branch cutoffs instead
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return Object.entries(
+                    filteredCutoffs.reduce((acc, curr) => {
+                      const bName = curr.branch?.branchName || 'General';
+                      if (!acc[bName]) acc[bName] = [];
+                      acc[bName].push(curr);
+                      return acc;
+                    }, {})
+                  ).map(([branchName, yearsData], i) => (
+                    <div key={i} className="bg-[#0f172a] rounded-xl border border-[#1e293b] p-3 shadow-inner">
+                      <h4 className="text-[12px] font-semibold text-blue-300 mb-2 border-b border-[#1e293b] pb-1">{branchName}</h4>
+                      <div className="flex flex-col gap-1.5 mt-2">
+                        {yearsData.sort((a,b) => b.year - a.year || a.capRound - b.capRound).map((y, j) => (
+                          <div key={j} className="bg-[#030712] rounded-lg p-2 border border-[#1e293b]/50 flex justify-between items-center text-[11px] group hover:border-purple-500/30 transition-colors">
+                            <div className="flex items-center gap-2 text-[#94a3b8]">
+                              <span className="font-bold text-white bg-[#1e293b] px-1.5 py-0.5 rounded">{y.year}</span>
+                              <span className="font-medium">Round {y.capRound}</span>
+                              <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">{y.category}</span>
+                            </div>
+                            <span className="font-bold text-emerald-400">{y.closingPercentile}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Live details panel */}
       {open && (

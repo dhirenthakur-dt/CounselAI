@@ -252,7 +252,7 @@ export default function ExploreColleges() {
                               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 {Object.entries(
                                   cutoffs[college.id].reduce((acc, c) => {
-                                    const bName = c.branch.branchName;
+                                    const bName = c.branch?.branchName || 'General';
                                     if (!acc[bName]) acc[bName] = [];
                                     acc[bName].push(c);
                                     return acc;
@@ -273,8 +273,8 @@ export default function ExploreColleges() {
                                           </tr>
                                         </thead>
                                         <tbody className="divide-y divide-[#1f2937]">
-                                          {branchCutoffs.map(c => (
-                                            <tr key={c.id} className="hover:bg-[#1e293b]/50 transition-colors">
+                                          {branchCutoffs.sort((a,b) => b.year - a.year || a.capRound - b.capRound).map((c, idx) => (
+                                            <tr key={c.id || idx} className="hover:bg-[#1e293b]/50 transition-colors">
                                               <td className="px-4 py-2">
                                                 <span className="bg-[#1f2937] px-2 py-0.5 rounded text-xs text-[#d1d5db] font-medium border border-[#374151]">{c.category}</span>
                                               </td>

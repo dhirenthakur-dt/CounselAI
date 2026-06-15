@@ -7,6 +7,15 @@ export const counselStudent = async (message) => {
   return res.data;
 };
 
+export const followUpQuestion = async (message, previousProfile, previousColleges) => {
+  const res = await axios.post(`${AI}/follow-up`, {
+    message,
+    previous_profile: previousProfile,
+    previous_colleges: previousColleges
+  });
+  return res.data;
+};
+
 export const getLiveCollegeDetails = async (college_name, college_id) => {
   const res = await axios.post(`${AI}/college/live-details`, { college_name, college_id });
   return res.data;

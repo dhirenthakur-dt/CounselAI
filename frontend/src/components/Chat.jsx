@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { counselStudent } from '../api';
+import { counselStudent, followUpQuestion } from '../api';
 import CollegeCard from './CollegeCard';
 import DocumentList from './DocumentList';
 import ExploreColleges from './ExploreColleges';
@@ -51,8 +51,14 @@ export default function Chat() {
   const [input, setInput]             = useState('');
   const [loading, setLoading]         = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lastResult, setLastResult]   = useState(null);
   const bottomRef                     = useRef(null);
   const inputRef                      = useRef(null);
+
+  // Helper to check if message contains percentile/profile data
+  const hasProfileData = (text) => {
+    return /\b\d{1,2}(\.\d+)?\s*(percentile|%)\b/i.test(text) || /\b(obc|sc|st|ews|open|general)\b/i.test(text);
+  };
 
   useEffect(() => {
     setMessages([{
@@ -76,7 +82,18 @@ export default function Chat() {
     setLoading(true);
     setSidebarOpen(false);
     try {
-      const data = await counselStudent(msg);
+      let data;
+      // If no new profile data is detected and we have a previous result, treat as follow-up
+      if (!hasProfileData(msg) && lastResult) {
+        data = await followUpQuestion(msg, lastResult.profile, lastResult.colleges);
+      } else {
+        // Fresh counseling query
+        data = await counselStudent(msg);
+        if (data.profile && data.colleges?.length > 0) {
+          setLastResult({ profile: data.profile, colleges: data.colleges });
+        }
+      }
+
       setMessages(prev => [...prev, {
         role: 'bot',
         text: data.response || 'Sorry, something went wrong.',

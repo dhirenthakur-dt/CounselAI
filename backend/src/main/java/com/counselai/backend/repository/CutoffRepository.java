@@ -26,7 +26,7 @@ public interface CutoffRepository extends JpaRepository<Cutoff, Long> {
         WHERE c.category = :category
         AND c.year = :year
         AND c.capRound = :capRound
-        AND c.closingPercentile <= :studentPercentile
+        AND c.closingPercentile <= (:studentPercentile + 5.0)
         ORDER BY c.closingPercentile DESC
         """)
     List<Cutoff> findEligibleColleges(
