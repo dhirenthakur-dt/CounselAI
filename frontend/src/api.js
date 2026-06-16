@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const AI = 'http://localhost:8001';
+const AI = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8001';
 
 export const counselStudent = async (message) => {
   const res = await axios.post(`${AI}/counsel`, { message });
