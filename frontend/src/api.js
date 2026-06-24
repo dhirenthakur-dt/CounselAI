@@ -21,7 +21,7 @@ export const getLiveCollegeDetails = async (college_name, college_id) => {
   return res.data;
 };
 
-const API = 'http://localhost:8080/api';
+const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080/api';
 
 export const getDistricts = async () => {
   const res = await axios.get(`${API}/colleges/districts`);
