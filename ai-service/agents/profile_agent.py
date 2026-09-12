@@ -215,6 +215,13 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
             max_tokens=500
         )
         raw = response.choices[0].message.content.strip()
+        if raw.startswith("```json"):
+            raw = raw[7:]
+        elif raw.startswith("```"):
+            raw = raw[3:]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+        raw = raw.strip()
 
         profile = json.loads(raw)
         profile = normalize_profile(profile, user_message)
