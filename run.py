@@ -14,7 +14,7 @@ def main():
     services = [
         {
             "name": "Java Backend (Port 8080)",
-            "cmd": "mvnw.cmd spring-boot:run",
+            "cmd": 'mvnw.cmd spring-boot:run "-Dmaven.wagon.http.ssl.insecure=true" "-Dmaven.wagon.http.ssl.allowall=true" "-Dmaven.wagon.http.ssl.ignore.validity.dates=true"',
             "cwd": os.path.join(base_dir, "backend")
         },
         {

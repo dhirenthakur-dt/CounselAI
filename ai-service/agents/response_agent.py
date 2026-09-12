@@ -60,7 +60,7 @@ Use simple English. Be friendly. Maximum 300 words.
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama3-8b-8192",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
             max_tokens=600

@@ -86,6 +86,14 @@ export default function Chat() {
       // If no new profile data is detected and we have a previous result, treat as follow-up
       if (!hasProfileData(msg) && lastResult) {
         data = await followUpQuestion(msg, lastResult.profile, lastResult.colleges);
+      } else if (!hasProfileData(msg) && !lastResult) {
+        // Validation: No profile data and no previous result
+        data = {
+          response: "⚠️ I couldn't find a percentile or category in your message. Please provide your **percentile**, **category** (e.g., General, OBC, SC), and any location/branch preferences so I can assist you properly.\n\n*Example: '95 percentile, General, Pune, Computer Science'*",
+          colleges: [],
+          profile: null,
+          documents: null
+        };
       } else {
         // Fresh counseling query
         data = await counselStudent(msg);
