@@ -209,7 +209,7 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
 
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
             max_tokens=500
@@ -237,20 +237,34 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
 
     except Exception as e:
         print(f"[ERROR] Profile Agent error: {e}")
-        # Check if it's a quota exceeded error
-        if "RESOURCE_EXHAUSTED" in str(e) or "quota" in str(e).lower():
-            # Fallback to parsing the message manually
-            print("[WARN] Quota exceeded, parsing profile manually")
-            profile = parse_profile_from_message(user_message)
-            profile = normalize_profile(profile, user_message)
-            state["percentile"]    = profile.get("percentile")
-            state["category"]      = profile.get("category")
-            state["district"]      = profile.get("district")
-            state["branches"]      = profile.get("branches")
-            state["budget"]        = profile.get("budget")
-            state["hostel_needed"] = profile.get("hostel_needed")
-            print(f"[OK] Profile Agent parsed manually: {profile}")
-        else:
+        # Fallback to parsing the message manually on ANY error
+        print("[WARN] LLM failed, parsing profile manually")
+        profile = parse_profile_from_message(user_message)
+        profile = normalize_profile(profile, user_message)
+        state["percentile"]    = profile.get("percentile")
+        state["category"]      = profile.get("category")
+        state["district"]      = profile.get("district")
+        state["branches"]      = profile.get("branches")
+        state["budget"]        = profile.get("budget")
+        state["hostel_needed"] = profile.get("hostel_needed")
+        print(f"[OK] Profile Agent parsed manually: {profile}")
+
+    # Fallback in case LLM succeeded but returned null for critical fields
+    if state.get("percentile") is None or state.get("category") is None:
+        print("[WARN] LLM returned null for required fields, attempting manual parse")
+        profile = parse_profile_from_message(user_message)
+        profile = normalize_profile(profile, user_message)
+        if profile.get("percentile") is not None:
+            state["percentile"] = profile.get("percentile")
+        if profile.get("category") is not None:
+            state["category"] = profile.get("category")
+        if profile.get("district") is not None and not state.get("district"):
+            state["district"] = profile.get("district")
+        if profile.get("branches") is not None and not state.get("branches"):
+            state["branches"] = profile.get("branches")
+        
+        # If still none, set error
+        if state.get("percentile") is None or state.get("category") is None:
             state["error"] = "Could not understand your message. Please try again."
 
     return state
