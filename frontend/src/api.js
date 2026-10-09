@@ -2,8 +2,12 @@ import axios from 'axios';
 
 const AI = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8001';
 
-export const counselStudent = async (message) => {
-  const res = await axios.post(`${AI}/counsel`, { message });
+export const counselStudent = async (message, previousProfile = null, previousColleges = null) => {
+  const res = await axios.post(`${AI}/counsel`, { 
+    message, 
+    previous_profile: previousProfile, 
+    previous_colleges: previousColleges 
+  });
   return res.data;
 };
 

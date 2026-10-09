@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { counselStudent, followUpQuestion } from '../api';
+import { counselStudent } from '../api';
 import CollegeCard from './CollegeCard';
 import DocumentList from './DocumentList';
 import ExploreColleges from './ExploreColleges';
@@ -55,10 +55,7 @@ export default function Chat() {
   const bottomRef                     = useRef(null);
   const inputRef                      = useRef(null);
 
-  // Helper to check if message contains percentile/profile data
-  const hasProfileData = (text) => {
-    return /\b\d{1,2}(\.\d+)?\s*(percentile|%)\b/i.test(text) || /\b(obc|sc|st|ews|open|general)\b/i.test(text);
-  };
+  // The old hasProfileData regex check was removed as the backend now properly handles intent and state.
 
   useEffect(() => {
     setMessages([{
@@ -83,21 +80,25 @@ export default function Chat() {
     setSidebarOpen(false);
     try {
       let data;
-      // If no new profile data is detected and we have a previous result, treat as follow-up
-      if (!hasProfileData(msg) && lastResult) {
-        data = await followUpQuestion(msg, lastResult.profile, lastResult.colleges);
-      } else if (!hasProfileData(msg) && !lastResult) {
-        // Validation: No profile data and no previous result
-        data = {
-          response: "⚠️ I couldn't find a percentile or category in your message. Please provide your **percentile**, **category** (e.g., General, OBC, SC), and any location/branch preferences so I can assist you properly.\n\n*Example: '95 percentile, General, Pune, Computer Science'*",
-          colleges: [],
-          profile: null,
-          documents: null
-        };
-      } else {
-        // Fresh counseling query
-        data = await counselStudent(msg);
+      // If we have previous context, pass it to counselStudent so it can merge updates (like branch changes)
+      if (lastResult) {
+        data = await counselStudent(msg, lastResult.profile, lastResult.colleges);
         if (data.profile && data.colleges?.length > 0) {
+          setLastResult({ profile: data.profile, colleges: data.colleges });
+        }
+      } else {
+        // Fresh query without previous context
+        data = await counselStudent(msg);
+        
+        // If the backend returned an error because mandatory fields (percentile/category) were missing
+        if (data.error && !data.profile?.percentile) {
+           data = {
+            response: "⚠️ I couldn't find a percentile or category in your message. Please provide your **percentile**, **category** (e.g., General, OBC, SC), and any location/branch preferences so I can assist you properly.\n\n*Example: '95 percentile, General, Pune, Computer Science'*",
+            colleges: [],
+            profile: null,
+            documents: null
+          };
+        } else if (data.profile && data.colleges?.length > 0) {
           setLastResult({ profile: data.profile, colleges: data.colleges });
         }
       }

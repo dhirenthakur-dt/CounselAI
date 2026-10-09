@@ -1,0 +1,38 @@
+CounselAI - Project Overview & Information
+
+1. THE PROBLEM
+The college admission process for MHT-CET (Maharashtra) is overwhelmingly complex, stressful, and data-heavy. 
+- Massive Data Overhead: Students are forced to manually sift through thousands of pages of PDF documents to find historical cutoffs across multiple years, branches, categories, and CAP Rounds.
+- Expensive & Inaccessible Counseling: Professional human counselors charge exorbitant fees to guide students, making personalized counseling inaccessible to many.
+- Scattered Information: Critical details like current fee structures, hostel availability, and placement statistics are scattered across various unreliable, ad-heavy websites.
+- High Risk of Errors: Manually mapping a student's percentile and category (e.g., OBC, EWS, TFWS) to the right college is highly prone to human error, leading to missed opportunities.
+
+2. OUR PREPARED SOLUTION
+We built CounselAI—an intelligent, autonomous, and conversational AI college counselor. It acts as a 24/7 personalized guide that automates the entire college shortlisting and admission strategy process. Instead of filling out complex forms and navigating filters, students simply chat with the AI in natural language, tell it their scores, category, and preferences, and instantly receive a highly accurate, tailor-made college list.
+
+3. HOW WE ARE SOLVING THE PROBLEM (Architecture & Workflow)
+We solve this using a cutting-edge Multi-Agent LLM pipeline (built with LangGraph, FastAPI, and Llama-3.1 via Groq) combined with a highly interactive React frontend.
+
+- Profile Agent: Analyzes the user's natural language chat to extract key data points (Percentile, Category, Preferred Branches like CS/IT, Preferred Districts like Pune/Mumbai).
+- Eligibility Agent: The core engine. It queries a massive historical database of actual MHT-CET cutoffs. It strictly calculates the user's chances (High, Medium, Low, Stretch) by mapping their exact category and percentile against historical closing ranks.
+- Strategy Agent: Crafts a customized action plan and ranks the best college options.
+- Document Agent: Dynamically generates a precise checklist of legal documents the student needs (e.g., Caste Validity, Non-Creamy Layer, EWS Proforma) based strictly on their claimed category.
+- Live Data Fetcher: Reaches out to the live web to fetch real-time official websites, hostel links, and fee structures for the recommended colleges.
+- Interactive UI: Replaces boring spreadsheets with dynamic, glass-morphism "College Cards". The UI includes interactive tabs that let students effortlessly drill down into historical cutoffs by specific Years (2024, 2023, 2022) and specific CAP Rounds (Round 1, Round 2).
+
+4. COMPARISON WITH CURRENT RELATED APPLICATIONS
+- Traditional Platforms (Shiksha, CollegeDunia, Careers360):
+  * How they work: They are static directory websites relying on manual search filters.
+  * Flaws: They bombard students with ads, sell student data to private colleges, and only provide generic, often outdated cutoff ranges. They do not offer personalized consultation.
+- Human Counselors:
+  * How they work: 1-on-1 offline or Zoom consultation.
+  * Flaws: Very expensive, limited by human memory, and cannot instantly cross-reference thousands of permutations of branches and categories.
+- Basic ChatGPT/Claude:
+  * Flaws: Standard LLMs hallucinate cutoffs and don't have access to the massive, structured, state-specific MHT-CET database.
+
+5. OUR UNIQUENESS (USPs)
+- Agentic Pipeline: We don't rely on a single AI prompt. Our system delegates tasks to specialized AI agents (Profile, Eligibility, Strategy, Document), ensuring zero hallucinations and strict mathematical accuracy for cutoffs.
+- Hybrid Data Model (Historical + Live): We use strict historical databases for cutoff accuracy, but use Live Web Scraping for volatile data like fees and placement links, giving the student the best of both worlds.
+- Conversational-First: Zero learning curve. The student just talks to the AI as if it were a real human counselor.
+- Advanced Granular UI: Our custom-built frontend allows students to visually analyze cutoff trends by year and by round without ever leaving the chat interface.
+- End-to-End Handholding: We don't just give a list of colleges; we provide the strategy, the safety margins, and the exact documents required for their specific admission category.

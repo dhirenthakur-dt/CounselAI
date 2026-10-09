@@ -18,6 +18,8 @@ app.add_middleware(
 
 class StudentMessage(BaseModel):
     message: str
+    previous_profile: Optional[Dict[str, Any]] = None
+    previous_colleges: Optional[List[Dict[str, Any]]] = None
 
 
 class CollegeSearchRequest(BaseModel):
@@ -72,15 +74,18 @@ def extract_profile(body: StudentMessage):
 
 @app.post("/counsel")
 def counsel_student(body: StudentMessage):
+    # Initialize state with previous profile if available
+    prev_prof = body.previous_profile or {}
+    
     initial_state = {
         "user_message":    body.message,
-        "percentile":      None,
-        "category":        None,
-        "district":        None,
-        "branches":        None,
-        "budget":          None,
-        "hostel_needed":   None,
-        "ranked_colleges": None,
+        "percentile":      prev_prof.get("percentile"),
+        "category":        prev_prof.get("category"),
+        "district":        prev_prof.get("district"),
+        "branches":        prev_prof.get("branches"),
+        "budget":          prev_prof.get("budget"),
+        "hostel_needed":   prev_prof.get("hostel_needed"),
+        "ranked_colleges": body.previous_colleges,
         "strategy":        None,
         "documents":       None,
         "final_response":  None,
@@ -110,7 +115,7 @@ def counsel_student(body: StudentMessage):
             "budget":        result.get("budget"),
             "hostel_needed": result.get("hostel_needed"),
         },
-        "colleges":  result.get("ranked_colleges", [])[:10],
+        "colleges":  result.get("ranked_colleges", [])[:10] if result.get("ranked_colleges") else [],
         "strategy":  result.get("strategy"),
         "documents": result.get("documents"),
         "error":     result.get("error")

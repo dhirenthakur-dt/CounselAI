@@ -226,12 +226,18 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
         profile = json.loads(raw)
         profile = normalize_profile(profile, user_message)
 
-        state["percentile"]    = profile.get("percentile")
-        state["category"]      = profile.get("category")
-        state["district"]      = profile.get("district")
-        state["branches"]      = profile.get("branches")
-        state["budget"]        = profile.get("budget")
-        state["hostel_needed"] = profile.get("hostel_needed")
+        if profile.get("percentile") is not None:
+            state["percentile"] = profile.get("percentile")
+        if profile.get("category") is not None:
+            state["category"] = profile.get("category")
+        if profile.get("district") is not None:
+            state["district"] = profile.get("district")
+        if profile.get("branches") is not None:
+            state["branches"] = profile.get("branches")
+        if profile.get("budget") is not None:
+            state["budget"] = profile.get("budget")
+        if profile.get("hostel_needed") is not None:
+            state["hostel_needed"] = profile.get("hostel_needed")
 
         print(f"[OK] Profile Agent extracted: {profile}")
 
@@ -241,12 +247,18 @@ Return ONLY the JSON. No explanation. No markdown. No backticks.
         print("[WARN] LLM failed, parsing profile manually")
         profile = parse_profile_from_message(user_message)
         profile = normalize_profile(profile, user_message)
-        state["percentile"]    = profile.get("percentile")
-        state["category"]      = profile.get("category")
-        state["district"]      = profile.get("district")
-        state["branches"]      = profile.get("branches")
-        state["budget"]        = profile.get("budget")
-        state["hostel_needed"] = profile.get("hostel_needed")
+        if profile.get("percentile") is not None:
+            state["percentile"] = profile.get("percentile")
+        if profile.get("category") is not None:
+            state["category"] = profile.get("category")
+        if profile.get("district") is not None:
+            state["district"] = profile.get("district")
+        if profile.get("branches") is not None:
+            state["branches"] = profile.get("branches")
+        if profile.get("budget") is not None:
+            state["budget"] = profile.get("budget")
+        if profile.get("hostel_needed") is not None:
+            state["hostel_needed"] = profile.get("hostel_needed")
         print(f"[OK] Profile Agent parsed manually: {profile}")
 
     # Fallback in case LLM succeeded but returned null for critical fields
