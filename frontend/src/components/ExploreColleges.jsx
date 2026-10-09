@@ -3,6 +3,86 @@ import { searchColleges, getDistricts, getCollegesByDistrict, getCollegeCutoffs,
 
 const NAAC_SCORES = { 'A++': 7, 'A+': 6, 'A': 5, 'B++': 4, 'B+': 3, 'B': 2, 'C': 1 };
 
+const CollegeCutoffViewer = ({ data }) => {
+  const branches = [...new Set(data.map(c => c.branch?.branchName || 'General'))].sort();
+  const [activeBranch, setActiveBranch] = useState(branches[0]);
+
+  const branchData = data.filter(c => (c.branch?.branchName || 'General') === activeBranch);
+
+  const years = [...new Set(branchData.map(c => c.year))].sort((a,b) => b - a);
+  const [activeYear, setActiveYear] = useState(years[0] || 2024);
+  
+  useEffect(() => {
+    const newYears = [...new Set(data.filter(c => (c.branch?.branchName || 'General') === activeBranch).map(c => c.year))].sort((a,b) => b - a);
+    if (!newYears.includes(activeYear)) {
+      setActiveYear(newYears[0]);
+    }
+  }, [activeBranch, data, activeYear]);
+
+  const yearData = branchData.filter(c => c.year === activeYear);
+
+  const rounds = [...new Set(yearData.map(c => c.capRound))].sort((a,b) => a - b);
+  const [activeRound, setActiveRound] = useState(rounds[0] || 1);
+
+  useEffect(() => {
+    const newRounds = [...new Set(data.filter(c => (c.branch?.branchName || 'General') === activeBranch && c.year === activeYear).map(c => c.capRound))].sort((a,b) => a - b);
+    if (!newRounds.includes(activeRound)) {
+      setActiveRound(newRounds[0]);
+    }
+  }, [activeYear, activeBranch, data, activeRound]);
+
+  const finalData = yearData.filter(c => c.capRound === activeRound);
+
+  return (
+    <div className="bg-[#111827] rounded-xl border border-[#374151] overflow-hidden flex flex-col">
+      <div className="p-3 border-b border-[#374151] bg-[#1a2235]">
+        <select 
+          value={activeBranch} 
+          onChange={e => setActiveBranch(e.target.value)}
+          className="w-full bg-[#0a0e1a] border border-[#374151] rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
+        >
+          {branches.map(b => <option key={b} value={b}>{b}</option>)}
+        </select>
+      </div>
+
+      <div className="flex gap-2 p-3 overflow-x-auto border-b border-[#374151] custom-scrollbar">
+        {years.map(y => (
+          <button
+            key={y}
+            onClick={() => setActiveYear(y)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0 ${activeYear === y ? 'bg-blue-500 text-white' : 'bg-[#1f2937] text-[#9ca3af] hover:text-white hover:bg-[#374151]'}`}
+          >
+            {y}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-2 p-3 overflow-x-auto border-b border-[#374151] bg-[#111827] custom-scrollbar">
+        {rounds.map(r => (
+          <button
+            key={r}
+            onClick={() => setActiveRound(r)}
+            className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-colors shrink-0 ${activeRound === r ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' : 'bg-[#1f2937] text-[#9ca3af] border border-transparent hover:text-white'}`}
+          >
+            Round {r}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar">
+        {finalData.map((c, i) => (
+          <div key={i} className="flex justify-between items-center bg-[#0a0e1a] p-3 rounded-xl border border-[#1f2937] hover:border-[#374151] transition-colors">
+            <span className="text-xs font-bold text-[#9ca3af]">{c.category}</span>
+            <span className="text-sm font-bold text-white">{c.closingPercentile}</span>
+          </div>
+        ))}
+        {finalData.length === 0 && (
+          <div className="col-span-full text-center text-[#6b7280] py-4 text-xs">No cutoffs found.</div>
+        )}
+      </div>
+    </div>
+  );
+};
 export default function ExploreColleges() {
   const [query, setQuery] = useState('');
   const [districts, setDistricts] = useState([]);
@@ -249,46 +329,7 @@ export default function ExploreColleges() {
                             <h4 className="text-xs font-bold text-[#6b7280] tracking-widest uppercase">Past Branch-Wise Cutoffs</h4>
                             
                             {cutoffs[college.id]?.length > 0 ? (
-                              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                                {Object.entries(
-                                  cutoffs[college.id].reduce((acc, c) => {
-                                    const bName = c.branch?.branchName || 'General';
-                                    if (!acc[bName]) acc[bName] = [];
-                                    acc[bName].push(c);
-                                    return acc;
-                                  }, {})
-                                ).map(([branchName, branchCutoffs]) => (
-                                  <div key={branchName} className="bg-[#111827] rounded-xl border border-[#374151] overflow-hidden">
-                                    <div className="bg-[#1f2937]/50 px-4 py-3 border-b border-[#374151]">
-                                      <h5 className="font-semibold text-[#e5e7eb] text-sm">{branchName}</h5>
-                                    </div>
-                                    <div className="overflow-x-auto">
-                                      <table className="w-full text-left text-sm text-[#9ca3af]">
-                                        <thead className="text-[11px] text-[#6b7280] uppercase bg-[#0a0e1a]">
-                                          <tr>
-                                            <th className="px-4 py-2.5">Category</th>
-                                            <th className="px-4 py-2.5">Cutoff (%ile)</th>
-                                            <th className="px-4 py-2.5">Round</th>
-                                            <th className="px-4 py-2.5">Year</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-[#1f2937]">
-                                          {branchCutoffs.sort((a,b) => b.year - a.year || a.capRound - b.capRound).map((c, idx) => (
-                                            <tr key={c.id || idx} className="hover:bg-[#1e293b]/50 transition-colors">
-                                              <td className="px-4 py-2">
-                                                <span className="bg-[#1f2937] px-2 py-0.5 rounded text-xs text-[#d1d5db] font-medium border border-[#374151]">{c.category}</span>
-                                              </td>
-                                              <td className="px-4 py-2 font-bold text-emerald-400">{c.closingPercentile}</td>
-                                              <td className="px-4 py-2 text-xs">Round {c.capRound}</td>
-                                              <td className="px-4 py-2 text-xs">{c.year}</td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                              <CollegeCutoffViewer data={cutoffs[college.id]} />
                             ) : (
                               <div className="p-8 text-center text-[#6b7280] bg-[#111827] rounded-xl border border-[#374151] border-dashed">
                                 No cutoff data available for this college.
