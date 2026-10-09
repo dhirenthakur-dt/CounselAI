@@ -16,6 +16,7 @@ export default function CollegeCard({ college, rank }) {
   const [cutoffsLoading, setCutoffsLoading] = useState(false);
   const [cutoffsOpen, setCutoffsOpen] = useState(false);
   const [selectedYears, setSelectedYears] = useState({});
+  const [selectedRounds, setSelectedRounds] = useState({});
   const [showAllBranches, setShowAllBranches] = useState(false);
   const c = CHANCE[college.chance] || CHANCE.LOW;
 
@@ -200,7 +201,15 @@ export default function CollegeCard({ college, rank }) {
                   ).map(([branchName, yearsData], i) => {
                     const availableYears = [...new Set(yearsData.map(y => y.year))].sort((a,b) => b - a);
                     const activeYear = selectedYears[branchName] || availableYears[0];
-                    const activeData = yearsData.filter(y => y.year === activeYear);
+                    const activeDataForYear = yearsData.filter(y => y.year === activeYear);
+
+                    const availableRounds = [...new Set(activeDataForYear.map(y => y.capRound))].sort((a,b) => a - b);
+                    const roundKey = `${branchName}-${activeYear}`;
+                    let activeRound = selectedRounds[roundKey];
+                    if (!availableRounds.includes(activeRound)) {
+                      activeRound = availableRounds[0];
+                    }
+                    const activeData = activeDataForYear.filter(y => y.capRound === activeRound);
 
                     return (
                       <div key={i} className="bg-[#0f172a] rounded-xl border border-[#1e293b] p-3 shadow-inner">
@@ -223,12 +232,30 @@ export default function CollegeCard({ college, rank }) {
                           ))}
                         </div>
 
-                        {/* Cutoff Data for Active Year */}
+                        {/* Round Tabs */}
+                        {availableRounds.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {availableRounds.map(rnd => (
+                              <button 
+                                key={rnd}
+                                onClick={() => setSelectedRounds(prev => ({...prev, [roundKey]: rnd}))}
+                                className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors border cursor-pointer ${
+                                  activeRound === rnd 
+                                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' 
+                                    : 'bg-[#030712] text-[#64748b] border-[#1e293b] hover:text-[#94a3b8] hover:bg-[#1e293b]'
+                                }`}
+                              >
+                                Round {rnd}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Cutoff Data for Active Round */}
                         <div className="flex flex-col gap-1.5">
-                          {activeData.sort((a,b) => a.capRound - b.capRound).map((y, j) => (
+                          {activeData.map((y, j) => (
                             <div key={j} className="bg-[#030712] rounded-lg p-2 border border-[#1e293b]/50 flex justify-between items-center text-[11px] group hover:border-purple-500/30 transition-colors">
                               <div className="flex items-center gap-2 text-[#94a3b8]">
-                                <span className="font-medium text-white bg-[#1e293b] px-1.5 py-0.5 rounded">Round {y.capRound}</span>
                                 <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">{y.category}</span>
                               </div>
                               <span className="font-bold text-emerald-400">{y.closingPercentile}%</span>
