@@ -15,6 +15,7 @@ export default function CollegeCard({ college, rank }) {
   const [cutoffs, setCutoffs]   = useState(null);
   const [cutoffsLoading, setCutoffsLoading] = useState(false);
   const [cutoffsOpen, setCutoffsOpen] = useState(false);
+  const [selectedYears, setSelectedYears] = useState({});
   const [showAllBranches, setShowAllBranches] = useState(false);
   const c = CHANCE[college.chance] || CHANCE.LOW;
 
@@ -164,7 +165,7 @@ export default function CollegeCard({ college, rank }) {
                 </button>
               </div>
               
-              <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                 {(() => {
                   // Filter cutoffs to only the recommended branch unless showAllBranches is true
                   const filteredCutoffs = showAllBranches
@@ -196,23 +197,47 @@ export default function CollegeCard({ college, rank }) {
                       acc[bName].push(curr);
                       return acc;
                     }, {})
-                  ).map(([branchName, yearsData], i) => (
-                    <div key={i} className="bg-[#0f172a] rounded-xl border border-[#1e293b] p-3 shadow-inner">
-                      <h4 className="text-[12px] font-semibold text-blue-300 mb-2 border-b border-[#1e293b] pb-1">{branchName}</h4>
-                      <div className="flex flex-col gap-1.5 mt-2">
-                        {yearsData.sort((a,b) => b.year - a.year || a.capRound - b.capRound).map((y, j) => (
-                          <div key={j} className="bg-[#030712] rounded-lg p-2 border border-[#1e293b]/50 flex justify-between items-center text-[11px] group hover:border-purple-500/30 transition-colors">
-                            <div className="flex items-center gap-2 text-[#94a3b8]">
-                              <span className="font-bold text-white bg-[#1e293b] px-1.5 py-0.5 rounded">{y.year}</span>
-                              <span className="font-medium">Round {y.capRound}</span>
-                              <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">{y.category}</span>
+                  ).map(([branchName, yearsData], i) => {
+                    const availableYears = [...new Set(yearsData.map(y => y.year))].sort((a,b) => b - a);
+                    const activeYear = selectedYears[branchName] || availableYears[0];
+                    const activeData = yearsData.filter(y => y.year === activeYear);
+
+                    return (
+                      <div key={i} className="bg-[#0f172a] rounded-xl border border-[#1e293b] p-3 shadow-inner">
+                        <h4 className="text-[12px] font-semibold text-blue-300 mb-3 border-b border-[#1e293b] pb-2">{branchName}</h4>
+                        
+                        {/* Year Tabs */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {availableYears.map(yr => (
+                            <button 
+                              key={yr}
+                              onClick={() => setSelectedYears(prev => ({...prev, [branchName]: yr}))}
+                              className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors border cursor-pointer ${
+                                activeYear === yr 
+                                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' 
+                                  : 'bg-[#030712] text-[#64748b] border-[#1e293b] hover:text-[#94a3b8] hover:bg-[#1e293b]'
+                              }`}
+                            >
+                              {yr}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Cutoff Data for Active Year */}
+                        <div className="flex flex-col gap-1.5">
+                          {activeData.sort((a,b) => a.capRound - b.capRound).map((y, j) => (
+                            <div key={j} className="bg-[#030712] rounded-lg p-2 border border-[#1e293b]/50 flex justify-between items-center text-[11px] group hover:border-purple-500/30 transition-colors">
+                              <div className="flex items-center gap-2 text-[#94a3b8]">
+                                <span className="font-medium text-white bg-[#1e293b] px-1.5 py-0.5 rounded">Round {y.capRound}</span>
+                                <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">{y.category}</span>
+                              </div>
+                              <span className="font-bold text-emerald-400">{y.closingPercentile}%</span>
                             </div>
-                            <span className="font-bold text-emerald-400">{y.closingPercentile}%</span>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ));
+                    );
+                  });
                 })()}
               </div>
             </div>
