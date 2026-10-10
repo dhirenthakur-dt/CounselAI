@@ -106,15 +106,14 @@ def import_colleges(conn, rows):
     print("\n🏫 Step 2: Importing colleges...")
     colleges = {}
     for r in rows:
-        code = r["college_code"].strip()
         name = r["college_name"].strip()
-        if code and name and code not in colleges:
-            colleges[code] = name
+        if name and name not in colleges:
+            colleges[name] = True
 
     cur = conn.cursor()
     batch = []
-    for code, name in colleges.items():
-        batch.append((name, detect_district(name), None, detect_type(name), code))
+    for name in colleges.keys():
+        batch.append((name, detect_district(name), None, detect_type(name), None))
 
     cur.executemany("""
         INSERT INTO colleges (name, district, city, college_type, website)
@@ -129,19 +128,16 @@ def import_branches(conn, rows):
     print("\n🌿 Step 3: Importing branches...")
     cur = conn.cursor()
 
-    cur.execute("SELECT id, name, website FROM colleges")
+    cur.execute("SELECT id, name FROM colleges")
     college_map = {}
-    for cid, cname, ccode in cur.fetchall():
+    for cid, cname in cur.fetchall():
         college_map[cname.strip()] = cid
-        if ccode:
-            college_map[ccode.strip()] = cid
 
     branches = {}
     for r in rows:
         cname  = r["college_name"].strip()
         bname  = r["branch_name"].strip()
-        ccode  = r["college_code"].strip()
-        cid    = college_map.get(cname) or college_map.get(ccode)
+        cid    = college_map.get(cname)
         if not cid:
             continue
         key = (cid, bname)
@@ -168,12 +164,10 @@ def import_cutoffs(conn, rows):
     cur = conn.cursor()
 
     # Build maps
-    cur.execute("SELECT id, name, website FROM colleges")
+    cur.execute("SELECT id, name FROM colleges")
     college_map = {}
-    for cid, cname, ccode in cur.fetchall():
+    for cid, cname in cur.fetchall():
         college_map[cname.strip()] = cid
-        if ccode:
-            college_map[ccode.strip()] = cid
 
     cur.execute("SELECT id, college_id, branch_name FROM branches")
     branch_map = {}
@@ -205,11 +199,10 @@ def import_cutoffs(conn, rows):
             continue
 
         cname = r["college_name"].strip()
-        ccode = r["college_code"].strip()
         bname = r["branch_name"].strip()
         cat   = r["category"].strip()
 
-        cid = college_map.get(cname) or college_map.get(ccode)
+        cid = college_map.get(cname)
         if not cid:
             skipped += 1
             continue
