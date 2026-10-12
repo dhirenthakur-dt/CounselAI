@@ -10,25 +10,29 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"), max_retries=0)
+GROQ_MODELS = ["qwen/qwen3.8-27b", "openai/gpt-oss-20b"]
 
 
 def generate_with_groq(prompt):
-    from groq import Groq
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=400
-    )
-    return response.choices[0].message.content.strip()
+    for model_name in GROQ_MODELS:
+        try:
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=400
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.warning(f"Groq model {model_name} failed in strategy agent: {e}")
+            continue
+    raise RuntimeError("All Groq models failed in strategy agent")
 
 
 def strategy_agent(state: dict) -> dict:
     """
-    Agent 3: Uses Gemini to generate CAP Round
-    strategy based on ranked colleges.
+    Agent 3: Generates CAP Round strategy based on ranked colleges.
     """
 
     colleges   = state.get("ranked_colleges") or []
@@ -63,7 +67,7 @@ Student Profile:
 Eligible colleges ranked by score:
 {college_summary}
 
-Give a clear CAP Round strategy in simple English. Include:
+Give a clear CAP Round strategy. Include:
 
 1. REACH colleges (Choice 1-2): Colleges where chance is LOW or borderline
 2. TARGET colleges (Choice 3-6): Colleges where chance is MEDIUM or HIGH
@@ -75,8 +79,7 @@ Give a clear CAP Round strategy in simple English. Include:
 
 5. ONE important tip specific to this student
 
-Keep it SHORT and CLEAR. Use simple words.
-Maximum 200 words total.
+Keep it SHORT and CLEAR. Maximum 200 words total.
 """
 
     try:
@@ -86,6 +89,6 @@ Maximum 200 words total.
 
     except Exception as e:
         logger.error(f"Strategy Agent failed: {e}")
-        state["strategy"] = "Strategy generation failed. Please check your colleges manually."
+        state["strategy"] = "Target your high chance colleges in Round 1. Keep safe backups for Round 2."
 
     return state

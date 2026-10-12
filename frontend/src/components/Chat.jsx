@@ -6,9 +6,10 @@ import ExploreColleges from './ExploreColleges';
 import ReactMarkdown from 'react-markdown';
 
 const EXAMPLES = [
-  { icon: '🎯', text: '87 percentile, OBC, Nashik, CS or IT' },
+  { icon: '🎯', text: 'mujhe cet mai 97 percentile hai mai OBC category se hu' },
   { icon: '🏛️', text: '95 percentile, General, Pune, Computer Science' },
-  { icon: '📚', text: '92 percentile, SC, Nagpur, AI or Data Science' },
+  { icon: '🚀', text: 'mera 94.5 percentile aaya hai, Pune me best CS colleges batao' },
+  { icon: '📚', text: 'EWS category hai 88 percentile, Mumbai me IT milega kya?' },
 ];
 
 function Avatar({ letter = 'C', size = 'w-9 h-9' }) {
@@ -60,7 +61,7 @@ export default function Chat() {
   useEffect(() => {
     setMessages([{
       role: 'bot',
-      text: `## Welcome to CounselAI 👋\n\nI'm your personal **MHT-CET admission counsellor** — powered by AI and real DTE Maharashtra data.\n\nTell me your **percentile**, **category**, **district**, and **branch preference** and I'll give you:\n- Personalised college shortlist with chance level\n- CAP Round strategy (which round to lock seat)\n- Live fee and hostel data on demand\n- Category-specific document checklist`,
+      text: `## Welcome to CounselAI 👋\n\nI'm your personal **MHT-CET admission counsellor** — powered by AI and real DTE Maharashtra data.\n\nAsk me in **English or Hinglish** (e.g., *"mujhe cet mai 97 percentile hai mai OBC category se hu"* or *"95 percentile, General, Pune, CS"*).\n\nTell me your **percentile**, **category**, **district**, and **branch preference** and I'll give you:\n- Personalised college shortlist with chance level\n- CAP Round strategy (which round to lock seat)\n- Live fee and hostel data on demand\n- Category-specific document checklist`,
     }]);
   }, []);
 
@@ -93,7 +94,7 @@ export default function Chat() {
         // If the backend returned an error because mandatory fields (percentile/category) were missing
         if (data.error && !data.profile?.percentile) {
            data = {
-            response: "⚠️ I couldn't find a percentile or category in your message. Please provide your **percentile**, **category** (e.g., General, OBC, SC), and any location/branch preferences so I can assist you properly.\n\n*Example: '95 percentile, General, Pune, Computer Science'*",
+            response: "⚠️ I couldn't find a percentile or category in your message.\n\nPlease provide your **percentile** and **category** (e.g., General, OBC, SC, EWS) in English or Hinglish so I can assist you properly.\n\n*Examples:*\n- *'mujhe cet mai 97 percentile hai mai OBC category se hu'*\n- *'95 percentile, General, Pune, Computer Science'*",
             colleges: [],
             profile: null,
             documents: null
@@ -311,7 +312,7 @@ export default function Chat() {
                           send();
                         }
                       }}
-                      placeholder="Type your percentile, category, district, branch..."
+                      placeholder="Type in English or Hinglish (e.g. mujhe cet mai 97 percentile hai, OBC, Pune CS)..."
                       disabled={loading}
                       className="w-full bg-transparent px-5 py-4 text-[14px] text-white placeholder-[#475569] resize-none focus:outline-none disabled:opacity-50 font-medium leading-relaxed"
                       style={{ maxHeight: '120px' }}

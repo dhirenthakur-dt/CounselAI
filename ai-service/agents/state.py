@@ -13,5 +13,6 @@ class CounselState(TypedDict):
     strategy: Optional[str]
     documents: Optional[dict]
     final_response: Optional[str]
+    query_language: Optional[str]
     messages: Optional[List[dict]]
     error: Optional[str]
