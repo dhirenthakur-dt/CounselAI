@@ -3,6 +3,7 @@ import { counselStudent } from '../api';
 import CollegeCard from './CollegeCard';
 import DocumentList from './DocumentList';
 import ExploreColleges from './ExploreColleges';
+import CompareColleges from './CompareColleges';
 import ReactMarkdown from 'react-markdown';
 
 const EXAMPLES = [
@@ -187,6 +188,18 @@ export default function Chat() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             <span className="font-semibold text-sm tracking-wide">Explore Colleges</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('compare')}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'compare' 
+                ? 'bg-purple-500/10 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.15)] border border-purple-500/20' 
+                : 'text-[#94a3b8] hover:bg-white/5 hover:text-white border border-transparent'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+            <span className="font-semibold text-sm tracking-wide">Compare Colleges</span>
+          </button>
         </div>
 
         {/* Example queries (only relevant for chat) */}
@@ -223,11 +236,15 @@ export default function Chat() {
           <button onClick={() => setSidebarOpen(true)} className="text-[#94a3b8] hover:text-white p-1 -ml-1 mr-1">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           </button>
-          <h2 className="text-[15px] font-bold text-white tracking-tight">{activeTab === 'chat' ? 'AI Counselor' : 'Explore Colleges'}</h2>
+          <h2 className="text-[15px] font-bold text-white tracking-tight">
+            {activeTab === 'chat' ? 'AI Counselor' : activeTab === 'explore' ? 'Explore Colleges' : 'Compare Colleges'}
+          </h2>
         </div>
 
         {activeTab === 'explore' ? (
           <ExploreColleges />
+        ) : activeTab === 'compare' ? (
+          <CompareColleges />
         ) : (
           <>
             {/* Messages */}

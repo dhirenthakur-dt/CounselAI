@@ -46,3 +46,13 @@ export const getCollegeCutoffs = async (id) => {
   const res = await axios.get(`${API}/colleges/${id}/cutoffs`);
   return res.data;
 };
+
+export const getAllColleges = async () => {
+  const res = await axios.get(`${API}/colleges`);
+  return res.data;
+};
+
+export const getCollegeById = async (id) => {
+  const res = await axios.get(`${API}/colleges/${id}`);
+  return res.data;
+};
