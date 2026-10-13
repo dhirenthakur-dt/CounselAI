@@ -149,18 +149,21 @@ export default function CompareColleges() {
 
   // Initialize selected branches when colleges load
   useEffect(() => {
-    if (branches1.length > 0 && !selectedBranch1) {
-      const defaultB = branches1.find(b => b.toLowerCase().includes('computer')) || branches1[0];
+    if (commonBranches.length > 0) {
+      const defaultB = commonBranches.find(b => b.toLowerCase().includes('computer')) || commonBranches[0];
       setSelectedBranch1(defaultB);
-    }
-  }, [branches1, selectedBranch1]);
-
-  useEffect(() => {
-    if (branches2.length > 0 && !selectedBranch2) {
-      const defaultB = branches2.find(b => b.toLowerCase().includes('computer')) || branches2[0];
       setSelectedBranch2(defaultB);
+    } else {
+      if (branches1.length > 0 && (!selectedBranch1 || !branches1.includes(selectedBranch1))) {
+        const defaultB1 = branches1.find(b => b.toLowerCase().includes('computer')) || branches1[0];
+        setSelectedBranch1(defaultB1);
+      }
+      if (branches2.length > 0 && (!selectedBranch2 || !branches2.includes(selectedBranch2))) {
+        const defaultB2 = branches2.find(b => b.toLowerCase().includes('computer')) || branches2[0];
+        setSelectedBranch2(defaultB2);
+      }
     }
-  }, [branches2, selectedBranch2]);
+  }, [branches1, branches2, commonBranches]);
 
   // If in sync mode, keep branch2 synced to branch1
   useEffect(() => {
@@ -601,7 +604,13 @@ export default function CompareColleges() {
 
                 <div className="flex justify-between text-[11px] text-[#94a3b8] font-medium pt-1">
                   <span>Category: {selectedCategory}</span>
-                  <span>{activeCutoff1 ? `Rank: #${activeCutoff1.closingRank || 'DTE'}` : 'No seat in this round'}</span>
+                  <span>
+                    {loading1 ? 'Loading cutoffs...' :
+                     activeCutoff1 ? `Rank: #${activeCutoff1.closingRank || 'DTE'}` : 
+                     cutoffs1.length === 0 ? '⚠️ No cutoffs in DB' :
+                     !branches1.includes(selectedBranch1) ? '⚠️ Branch not offered' :
+                     'No seat in this round'}
+                  </span>
                 </div>
               </div>
 
@@ -610,10 +619,10 @@ export default function CompareColleges() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="text-sm font-bold text-white line-clamp-1">{college2.name}</h4>
-                    <p className="text-xs text-emerald-400 font-semibold mt-0.5">{selectedBranch2}</p>
+                    <p className="text-xs text-emerald-400 font-semibold mt-0.5">{selectedBranch2 || 'No branch selected'}</p>
                   </div>
                   <span className="text-2xl font-black text-white">
-                    {activeCutoff2 ? `${activeCutoff2.closingPercentile}%` : 'N/A'}
+                    {loading2 ? '...' : activeCutoff2 ? `${activeCutoff2.closingPercentile}%` : 'N/A'}
                   </span>
                 </div>
 
@@ -627,7 +636,13 @@ export default function CompareColleges() {
 
                 <div className="flex justify-between text-[11px] text-[#94a3b8] font-medium pt-1">
                   <span>Category: {selectedCategory}</span>
-                  <span>{activeCutoff2 ? `Rank: #${activeCutoff2.closingRank || 'DTE'}` : 'No seat in this round'}</span>
+                  <span>
+                    {loading2 ? 'Loading cutoffs...' :
+                     activeCutoff2 ? `Rank: #${activeCutoff2.closingRank || 'DTE'}` : 
+                     cutoffs2.length === 0 ? '⚠️ No cutoffs in DB' :
+                     !branches2.includes(selectedBranch2) ? '⚠️ Branch not offered' :
+                     'No seat in this round'}
+                  </span>
                 </div>
               </div>
 
@@ -799,7 +814,7 @@ export default function CompareColleges() {
               <span>📈</span> 3-Year Historical Cutoff Trend for {selectedCategory}
             </h3>
             <p className="text-xs text-[#94a3b8] mb-4">
-              Comparing cutoff consistency between {selectedBranch1} ({college1.name}) and {selectedBranch2} ({college2.name}).
+              Comparing cutoff consistency between {selectedBranch1 || 'N/A'} ({college1.name}) and {selectedBranch2 || 'N/A'} ({college2.name}).
             </p>
 
             {historicalTrend.length > 0 ? (

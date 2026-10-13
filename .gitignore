@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 backend/target/
 .DS_Store
+venv/
+**/venv/
